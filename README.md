@@ -53,6 +53,17 @@ The fonts in `fonts/` are free X11 misc-fixed fonts (public domain; see `fonts/R
 stored in your work folder and never copied into this repository. Check an imported font's licence before
 you share an export that uses it: the export notes list the fonts each export embeds.
 
+To draw with the Octatrack's own eight fonts, extract them from **your own copy** of the OS update
+(the `.syx` from the official download, or an OS image you unpacked from it):
+
+```sh
+python3 tools/extract_fonts.py OCTATRACK_OS1.40C.syx      # writes os-font-1.bdf … os-font-8.bdf
+```
+
+They go to your font folder (or the folder given as a second argument). The script holds no firmware data
+and this repository ships none: the fonts are made on your machine from your file, for your own use. Do not
+redistribute them, and do not share exports that embed them.
+
 ## What Export writes
 
 | File | Content |

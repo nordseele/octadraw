@@ -67,6 +67,7 @@ An export folder holds:
 | `octadraw.py` | local HTTP server, editor only |
 | `ui_editor.html` | the editor (single file, no build step) |
 | `tests/bench_m68k.py` | ColdFire proof: generated code vs Python render, pixel for pixel |
+| `tools/extract_fonts.py` | the OS fonts as BDF, read from the user's own OS file (never commit its output) |
 
 **Rules:**
 - **One source of truth.** The preview, the PNGs and the code come from the same draw commands. A new layer type or
