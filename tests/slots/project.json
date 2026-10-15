@@ -1,0 +1,116 @@
+{
+  "version": 1,
+  "name": "Slot edge cases",
+  "styles": {
+    "default": {
+      "highlight_padding": 1
+    },
+    "wide": {
+      "highlight_padding": 2
+    }
+  },
+  "pages": [
+    {
+      "id": "slots",
+      "name": "Slots",
+      "background": "pattern",
+      "bg_pattern": "dots",
+      "bg_base": "white",
+      "components": [
+        {
+          "style": "default",
+          "type": "text",
+          "id": "clip",
+          "name": "$clip",
+          "x": 2,
+          "y": 2,
+          "width": 60,
+          "height": 5,
+          "text": "Clip",
+          "text_padding": 0,
+          "fill": "filled",
+          "background": "white",
+          "color": "black"
+        },
+        {
+          "style": "default",
+          "type": "text",
+          "id": "tiny",
+          "name": "$tiny",
+          "x": 66,
+          "y": 2,
+          "width": 20,
+          "height": 7,
+          "text": "Tiny",
+          "font": "fixed-4x6",
+          "fill": "filled",
+          "background": "white",
+          "color": "black"
+        },
+        {
+          "style": "default",
+          "type": "text",
+          "id": "centre",
+          "name": "$centre",
+          "x": 2,
+          "y": 10,
+          "width": 60,
+          "height": 10,
+          "text": "Centre",
+          "text_align": "center",
+          "text_case": "lower",
+          "text_padding": 1,
+          "fill": "filled",
+          "background": "black",
+          "color": "white"
+        },
+        {
+          "style": "default",
+          "type": "text",
+          "id": "space",
+          "name": "$space",
+          "x": 2,
+          "y": 22,
+          "width": 100,
+          "height": 9,
+          "text": "Wide spaces",
+          "space_width": 5,
+          "text_padding": 1,
+          "color": "black"
+        },
+        {
+          "style": "wide",
+          "type": "text",
+          "id": "big",
+          "name": "$big",
+          "x": 2,
+          "y": 34,
+          "width": 120,
+          "height": 16,
+          "text": "Big",
+          "font": "fixed-6x13B",
+          "text_align": "end",
+          "text_padding": 2,
+          "fill": "filled",
+          "background": "white",
+          "color": "black"
+        },
+        {
+          "style": "default",
+          "type": "text",
+          "id": "last",
+          "name": "$last",
+          "x": 2,
+          "y": 52,
+          "width": 124,
+          "height": 11,
+          "text": "Last",
+          "text_padding": 3,
+          "fill": "filled",
+          "background": "black",
+          "color": "white"
+        }
+      ]
+    }
+  ]
+}

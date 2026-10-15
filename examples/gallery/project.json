@@ -1,0 +1,243 @@
+{
+  "version": 1,
+  "name": "Gallery",
+  "styles": {
+    "default": {
+      "highlight_padding": 1
+    }
+  },
+  "pages": [
+    {
+      "id": "shapes",
+      "name": "Shapes",
+      "background": "white",
+      "components": [
+        {
+          "style": "default",
+          "id": "r",
+          "type": "rect",
+          "x": 20,
+          "y": 12,
+          "width": 40,
+          "height": 20,
+          "fill": "none",
+          "stroke": "black"
+        },
+        {
+          "style": "default",
+          "id": "sb",
+          "type": "scrollbar",
+          "x": 121,
+          "y": 12,
+          "width": 5,
+          "height": 40,
+          "orientation": "vertical",
+          "track": "arrows",
+          "total": 20,
+          "visible": 5,
+          "position": 1,
+          "color": "black"
+        },
+        {
+          "style": "default",
+          "id": "wv",
+          "type": "waveform",
+          "color": "black",
+          "x": 4,
+          "y": 36,
+          "width": 110,
+          "height": 26,
+          "signal": "loop",
+          "display": "mirror",
+          "amplitude": 90,
+          "cycles": 8,
+          "seed": 1,
+          "centre_style": "solid",
+          "centre_width": 1,
+          "playhead": 40
+        },
+        {
+          "style": "default",
+          "id": "sh",
+          "type": "shape",
+          "x": 66,
+          "y": 4,
+          "width": 25,
+          "height": 25,
+          "shape": "ellipse",
+          "fill": "invert",
+          "stroke": "black"
+        },
+        {
+          "style": "default",
+          "id": "tri",
+          "type": "shape",
+          "x": 94,
+          "y": 4,
+          "width": 22,
+          "height": 20,
+          "shape": "triangle",
+          "direction": "up",
+          "fill": "black",
+          "stroke": "none"
+        },
+        {
+          "style": "default",
+          "id": "t1",
+          "type": "text",
+          "x": 22,
+          "y": 15,
+          "width": 36,
+          "height": 9,
+          "text": "Hello",
+          "font": "fixed-4x6",
+          "text_padding": 1,
+          "color": "black"
+        }
+      ]
+    },
+    {
+      "id": "data",
+      "name": "Data",
+      "background": "white",
+      "components": [
+        {
+          "style": "default",
+          "id": "g",
+          "type": "grid",
+          "x": 4,
+          "y": 4,
+          "width": 100,
+          "height": 40,
+          "grid_rows": 4,
+          "grid_cols": 3,
+          "header_rows": 1,
+          "header": "invert",
+          "stroke": "black"
+        },
+        {
+          "style": "default",
+          "id": "iso",
+          "type": "iso",
+          "x": 86,
+          "y": 24,
+          "width": 41,
+          "height": 33,
+          "iso_a": 10,
+          "iso_b": 10,
+          "iso_h": 12,
+          "stroke": "black",
+          "top_fill": "checker",
+          "left_fill": "none",
+          "right_fill": "hlines"
+        },
+        {
+          "style": "default",
+          "id": "li",
+          "type": "list",
+          "x": 4,
+          "y": 46,
+          "width": 60,
+          "height": 17,
+          "items": "ONE, TWO",
+          "selected": 1,
+          "hug": false,
+          "color": "black"
+        },
+        {
+          "style": "default",
+          "id": "ms",
+          "type": "multislider",
+          "x": 66,
+          "y": 46,
+          "width": 20,
+          "height": 16,
+          "values": "3, 7, 2, 9, 5",
+          "range_max": 10,
+          "color": "black"
+        }
+      ]
+    },
+    {
+      "id": "fonts",
+      "name": "Fonts",
+      "background": "pattern",
+      "bg_pattern": "dots",
+      "bg_base": "white",
+      "components": [
+        {
+          "style": "default",
+          "id": "bg",
+          "type": "rect",
+          "x": 0,
+          "y": 0,
+          "width": 128,
+          "height": 64,
+          "fill": "black",
+          "stroke": "none"
+        },
+        {
+          "style": "default",
+          "id": "t2",
+          "type": "text",
+          "x": 4,
+          "y": 4,
+          "width": 120,
+          "height": 14,
+          "text": "Bold 6x13",
+          "font": "fixed-6x13B",
+          "color": "white"
+        },
+        {
+          "style": "default",
+          "id": "t3",
+          "type": "text",
+          "x": 4,
+          "y": 22,
+          "width": 120,
+          "height": 12,
+          "text": "Wide text, clipped at the end of its box",
+          "font": "fixed-6x10",
+          "color": "white"
+        },
+        {
+          "style": "default",
+          "id": "t4",
+          "type": "text",
+          "x": 4,
+          "y": 40,
+          "width": 60,
+          "height": 10,
+          "text": "Selected",
+          "font": "fixed-5x8",
+          "color": "white",
+          "selectable": true,
+          "focus_state": "selected"
+        },
+        {
+          "style": "default",
+          "id": "inv",
+          "type": "rect",
+          "x": 70,
+          "y": 38,
+          "width": 50,
+          "height": 20,
+          "fill": "none",
+          "stroke": "white",
+          "inverted": true
+        },
+        {
+          "style": "default",
+          "id": "ph",
+          "type": "placeholder",
+          "x": 72,
+          "y": 40,
+          "width": 46,
+          "height": 16,
+          "name": "ANIM",
+          "color": "white"
+        }
+      ]
+    }
+  ]
+}
