@@ -1,0 +1,103 @@
+{
+  "version": 1,
+  "name": "Checklist",
+  "styles": {
+    "default": {
+      "highlight_padding": 1
+    }
+  },
+  "pages": [
+    {
+      "id": "empty",
+      "name": "Checklist",
+      "background": "white",
+      "components": [
+        {
+          "id": "title",
+          "type": "text",
+          "style": "default",
+          "x": 2,
+          "y": 1,
+          "width": 124,
+          "height": 7,
+          "text": "SAMPLES"
+        },
+        {
+          "id": "list",
+          "type": "list",
+          "style": "default",
+          "x": 2,
+          "y": 11,
+          "width": 124,
+          "height": 52,
+          "items": "Kick,Snare,Hat,Clap,Bass,Lead,Pad,Stab",
+          "orientation": "grid",
+          "list_cols": 2,
+          "list_flow": "columns",
+          "item_width": "full",
+          "check": true,
+          "check_size": "auto",
+          "check_shape": "square",
+          "check_padding": 0,
+          "marks": "10101010",
+          "item_padding": 1,
+          "item_gap": 1,
+          "selected": 1,
+          "list_col_width": "equal"
+        }
+      ]
+    },
+    {
+      "id": "round",
+      "name": "Round",
+      "background": "white",
+      "components": [
+        {
+          "id": "list2",
+          "type": "list",
+          "style": "default",
+          "x": 4,
+          "y": 4,
+          "width": 120,
+          "height": 56,
+          "items": "One,Two,Three,Four,Five,Six",
+          "orientation": "grid",
+          "list_cols": 0,
+          "list_flow": "rows",
+          "check": true,
+          "check_size": 7,
+          "check_shape": "round",
+          "check_padding": 1,
+          "marks": "101010",
+          "item_padding": 1,
+          "item_gap": 2,
+          "selected": 0
+        }
+      ]
+    },
+    {
+      "id": "capped",
+      "name": "Capped",
+      "background": "white",
+      "components": [
+        {
+          "id": "list3",
+          "type": "list",
+          "style": "default",
+          "x": 4,
+          "y": 4,
+          "width": 120,
+          "height": 56,
+          "items": "AA,BB,CC,DD,EE,FF",
+          "orientation": "grid",
+          "list_cols": 0,
+          "list_flow": "rows",
+          "list_col_max": 18,
+          "item_padding": 1,
+          "item_gap": 2,
+          "selected": 0
+        }
+      ]
+    }
+  ]
+}

@@ -309,7 +309,13 @@ def resolve_components(doc, page, with_screen=False):
                     c[axis]=max(1,min((125 if axis=='x' else 61)-c[size],c[axis]))
         o=frame_out(c)
         if not (0<=c['x']-o and 0<=c['y']-o and c['x']+c['width']+margin(c)+o<=128 and c['y']+c['height']+margin(c)+o<=64):
-            raise ValueError('Alignment outside screen')
+            if c.get('hug') or c.get('hug_w') or c.get('hug_h'):
+                # Hug content that no longer fits the screen (a list grows with its items): clip it to the screen
+                # instead of failing the whole preview.
+                c['width']=min(c['width'],max(1,128-c['x']-margin(c)-o))
+                c['height']=min(c['height'],max(1,64-c['y']-margin(c)-o))
+            if not (0<=c['x']-o and 0<=c['y']-o and c['x']+c['width']+margin(c)+o<=128 and c['y']+c['height']+margin(c)+o<=64):
+                raise ValueError('Alignment outside screen')
         c['_parent_bounds']=area
         resolved[key]=c
         return c
@@ -532,8 +538,38 @@ def validate(doc):
                         a_=v(k,'')
                         if not isinstance(a_,str) or len(a_)>16 or a_.startswith('icon:') and not affix_glyph(a_):
                             raise ValueError('Prepend / append: up to 8 characters, or icon:<symbol>')
-                if not isinstance(c.get('items',''),str) or len(c.get('items',''))>400 or c.get('orientation','vertical') not in ('vertical','horizontal') or not isinstance(c.get('hug',False),bool) or c.get('text_align','start') not in ('start','center','end'):
+                if not isinstance(c.get('items',''),str) or len(c.get('items',''))>400 or c.get('orientation','vertical') not in ('vertical','horizontal','grid') or not isinstance(c.get('hug',False),bool) or c.get('text_align','start') not in ('start','center','end'):
                     raise ValueError('Invalid list')
+                for k in ('list_cols','list_rows'):
+                    v=c.get(k,0)
+                    if not isinstance(v,int) or isinstance(v,bool) or not 0<=v<=64:
+                        raise ValueError('List columns / rows: 0 (auto) to 64')
+                v=c.get('list_col_max',0)
+                if not isinstance(v,int) or isinstance(v,bool) or not 0<=v<=128:
+                    raise ValueError('List max column width: 0 (auto) to 128')
+                if c.get('list_col_width','hug') not in ('hug','equal'):
+                    raise ValueError('List column width: hug or equal')
+                if c.get('list_flow','columns') not in ('rows','columns'):
+                    raise ValueError('List fill order: rows or columns')
+                if c.get('check'):
+                    if c.get('check_shape','square') not in LIST_SHAPES:
+                        raise ValueError('Checkbox shape: square or round')
+                    cs=c.get('check_size','auto')
+                    if cs!='auto' and (not isinstance(cs,int) or isinstance(cs,bool) or not 5<=cs<=12):
+                        raise ValueError('Checkbox size: auto or 5..12')
+                    cp=c.get('check_padding',0)
+                    if not isinstance(cp,int) or isinstance(cp,bool) or not 0<=cp<=3:
+                        raise ValueError('Checkbox inner padding: 0..3')
+                    cg=c.get('check_gap',3)
+                    if not isinstance(cg,int) or isinstance(cg,bool) or not 0<=cg<=8:
+                        raise ValueError('Gap between checkbox and text: 0..8')
+                marks=c.get('marks','')
+                if not isinstance(marks,str) or len(marks)>64 or set(marks)-set('01'):
+                    raise ValueError('Checkbox states: up to 64 characters, 0 or 1')
+                if c.get('orientation')=='grid':
+                    cols,rows=c.get('list_cols',0) or 0,c.get('list_rows',0) or 0
+                    if cols and rows and cols*rows<len(list_items(c)):
+                        raise ValueError('List grid: not enough cells for its items')
             ss=c.get('stroke_sides')
             if ss is not None and (not isinstance(ss,list) or len(ss)!=4 or any(not isinstance(v,bool) for v in ss) or c['type'] not in STROKE_SIDES):
                 raise ValueError('Stroke sides: four booleans (top, right, bottom, left) on a rect, text, table, layout, list or multislider')
@@ -1210,6 +1246,7 @@ def draw_layout(img,c,_ink):
 
 LIST_BG=('none','black','white','invert'); LIST_STROKE=('none','black','white')
 LIST_STYLE_KEYS=('bg','stroke','stroke_width','stroke_style','color','underline','prepend','append')
+LIST_SHAPES=('square','round')
 
 
 def list_style(c,selected):
@@ -1239,40 +1276,123 @@ def affix_width(value,font_key):
     return P.text_width(FB.FONTS[font_key],clean_text(value,font_key,False))+2
 
 
+def check_size(c,fh):
+    """Checkbox side in pixels: `check_size` 5..12, or auto = the row text height minus two."""
+    v=c.get('check_size','auto')
+    return max(5,min(12,fh-2)) if v=='auto' else v
+
+
+def disc_cells(x,y,s):
+    """Filled disc of side s, as pixels (a 5x5 circle loses its corners)."""
+    mid=(s-1)/2; r=s/2-0.15
+    return {(x+i,y+j) for j in range(s) for i in range(s) if (i-mid)**2+(j-mid)**2<=r*r}
+
+
+def check_cells(x,y,s,shape,pad,checked):
+    """Pixels of a checkbox: a one-pixel ring, plus a filled core inset by `pad` when checked.
+    The padding is clamped so the core never disappears into the ring."""
+    if s<1:return set()
+    pad=min(pad,max(0,(s-3)//2))
+    if shape=='round':
+        cells=disc_cells(x,y,s)
+        if s>2:cells-=disc_cells(x+1,y+1,s-2)
+        if checked and s-2-2*pad>=1:cells|=disc_cells(x+1+pad,y+1+pad,s-2-2*pad)
+        return cells
+    cells=set()
+    for i in range(s):
+        cells|={(x+i,y),(x+i,y+s-1),(x,y+i),(x+s-1,y+i)}
+    if checked and s-2-2*pad>=1:
+        for j in range(1+pad,s-1-pad):
+            for i in range(1+pad,s-1-pad):cells.add((x+i,y+j))
+    return cells
+
+
 def list_geometry(c,x,y,w,h,hug=False):
-    """Every item of a list placed in (x, y, w, h): its box, text, affixes and style, plus the separators.
-    Shared by the Hug size and the drawing so both always agree."""
-    items=list_items(c); sel=c.get('selected',-1); horizontal=c.get('orientation','vertical')=='horizontal'
+    """Every item of a list placed in (x, y, w, h): its box, text, checkbox, affixes and style, plus the
+    separators. Shared by the Hug size and the drawing so both always agree. `orientation` grid reflows the
+    items into `list_cols` x `list_rows` cells (0 or absent = automatic)."""
+    items=list_items(c); sel=c.get('selected',-1); orientation=c.get('orientation','vertical')
+    if not items:return [],[],(1,1),''
+    grid=orientation=='grid'; horizontal=orientation=='horizontal'
     pt,pr,pb,pl=c.get('item_padding_sides') or (c.get('item_padding',1),)*4; gap=c.get('item_gap',1); sp=c.get('highlight_padding',0); full=c.get('item_width','text')=='full' and not hug   # Hug: Full row spans the content, not the room
     styles=[list_style(c,False),list_style(c,True)]
     fh=max(FB.metrics(st['font'],True)['height'] for st in styles)
+    check=bool(c.get('check')); cs=check_size(c,fh) if check else 0; mw=cs+(c.get('check_gap',3) if check else 0)
+    ch=max(fh,cs); rh=pt+ch+pb
     sep=c.get('sep','none'); sep_char=clean_text(c.get('sep_char','|'),c.get('font','default'),False) if sep=='char' else ''
     sep_w=P.text_width(FB.FONTS[c.get('font','default')],sep_char) if sep_char else 0
     reserve=max(affix_width(st['prepend'],st['font']) for st in styles) if c.get('prepend_reserve') else None
-    out=[]; seps=[]; cx,cy=x,y; right=bottom=0
+    meta=[]
     for i,item in enumerate(items):
-        st=styles[int(i==sel)]; font=FB.FONTS[st['font']]; text=clean_text(cased(c,item),st['font'],False)
-        pw=reserve if reserve is not None else affix_width(st['prepend'],st['font']); aw=affix_width(st['append'],st['font'])
-        if horizontal:
-            if out and cx>x+w-1:break
-            room=x+w-cx-pl-pr-pw-aw; value=P.fit(font,text,max(0,room)); tw=P.text_width(font,value)
-            left=cx+pl; box=[cx,y if full else cy,cx+pl+pw+tw+aw+pr-1,(y+h-1) if full else cy+pt+fh+pb-1]
-            cx=box[2]+1+gap+((sep_w+gap) if sep_char else 0)
-        else:
-            if out and cy>y+h-1:break
-            room=w-pl-pr-pw-aw; value=P.fit(font,text,max(0,room)); tw=P.text_width(font,value); mode='start' if hug else c.get('text_align','start')   # Hug size: alignment does not count
-            cw=pw+tw+aw; inner=w-pl-pr; left=x+pl+((inner-cw)//2 if mode=='center' else inner-cw if mode=='end' else 0)
-            box=[x if full else left-pl,cy,(x+w-1) if full else left+cw-1+pr,cy+pt+fh+pb-1]
-            cy=box[3]+1+gap
-        top=box[1]+pt if not (horizontal and full) else y+max(0,(h-fh)//2)
+        st=styles[int(i==sel)]
+        meta.append(dict(style=st,font=FB.FONTS[st['font']],text=clean_text(cased(c,item),st['font'],False),
+            pw=reserve if reserve is not None else affix_width(st['prepend'],st['font']),
+            aw=affix_width(st['append'],st['font'])))
+    def place(i,cx,cw,ry,row_h,top,check_top,span=True):
+        m=meta[i]; inner=cw-pl-pr
+        value=P.fit(m['font'],m['text'],max(0,inner-mw-m['pw']-m['aw'])); tw=P.text_width(m['font'],value)
+        block=mw+m['pw']+tw+m['aw']; mode='start' if hug or horizontal else c.get('text_align','start')
+        left=cx+pl+((inner-block)//2 if mode=='center' else inner-block if mode=='end' else 0)
+        box=[cx if full and span else left-pl,ry,(cx+cw-1) if full and span else left+block-1+pr,ry+row_h-1]
         core=list(box)
         if i==sel and sp:box=[box[0]-sp,box[1]-sp,box[2]+sp,box[3]+sp]
-        out.append(dict(index=i,box=box,core=core,left=left,top=top,value=value,tw=tw,pw=pw,aw=aw,style=st,selected=i==sel))
-        right=max(right,core[2]);bottom=max(bottom,core[3])
-    for a,b in zip(out,out[1:]):
-        if horizontal:seps.append(('v',a['core'][2]+1+(gap-1)//2) if not sep_char else ('char',a['core'][2]+1+gap))
-        else:seps.append(('h',a['core'][3]+1+(gap-1)//2))
-    return out,seps,(right-x+1 if out else 1,bottom-y+1 if out else 1),sep_char
+        return dict(index=i,box=box,core=core,left=left,top=top,check_top=check_top,value=value,tw=tw,
+            pw=m['pw'],aw=m['aw'],mw=mw,cs=cs,style=m['style'],selected=i==sel)
+    out=[]; seps=[]
+    if grid:
+        n=len(items); cols=c.get('list_cols',0) or 0; nrows=c.get('list_rows',0) or 0; flow=c.get('list_flow','columns'); cap=c.get('list_col_max',0) or 0; col_mode=c.get('list_col_width','hug')
+        if cols and nrows:
+            if cols*nrows<n:raise ValueError('List grid: not enough cells for its items')
+        elif cols:nrows=-(-n//cols)
+        elif nrows:cols=-(-n//nrows)
+        else:
+            widest=max([mw+m['pw']+P.text_width(m['font'],m['text'])+m['aw']+pl+pr for m in meta] or [1])
+            target=min(widest,cap) if cap else widest
+            cols=1 if hug else max(1,min(64,n or 1,(w+gap)//(max(1,target)+gap)))
+            nrows=max(1,-(-(n or 1)//max(1,cols)))
+        cols=max(1,min(64,cols)); nrows=max(1,min(64,nrows))
+        if cols*nrows<n:raise ValueError('List grid: not enough cells for its items')
+        slot=(lambda k:(k//nrows,k%nrows)) if flow=='columns' else (lambda k:(k%cols,k//cols))
+        natural=[0]*cols
+        for k,m in enumerate(meta):
+            j,_=slot(k); natural[j]=max(natural[j],mw+m['pw']+P.text_width(m['font'],m['text'])+m['aw']+pl+pr)
+        if hug or col_mode=='hug':
+            fill=max(natural) if natural and max(natural)>0 else 1
+            cw=[v if v else fill for v in natural]
+        else:
+            free=max(0,w-gap*(cols-1)); cw=[max(1,free//cols+(1 if j<free%cols else 0)) for j in range(cols)]
+            widest=max(natural) if natural else 1
+            if widest>1:cw=[max(v,widest) for v in cw]   # Equal never shrinks a column below its widest item
+        if cap:cw=[max(1,min(v,cap)) for v in cw]
+        col_x=[];cursor=x
+        for j in range(cols):col_x.append(cursor);cursor+=cw[j]+gap
+        for k in range(n):
+            j,r=slot(k); ry=y+r*(rh+gap)
+            out.append(place(k,col_x[j],cw[j],ry,rh,ry+pt+(ch-fh)//2,ry+pt+(ch-cs)//2))
+        right=col_x[-1]+cw[-1]; bottom=y+nrows*rh+(nrows-1)*gap
+        if sep in ('solid','dotted'):
+            for r in range(1,nrows):seps.append(('h',y+r*(rh+gap)-gap//2))
+            for j in range(1,cols):seps.append(('v',col_x[j]-gap//2))
+        return out,seps,(max(1,right-x),max(1,bottom-y)),''
+    if horizontal:
+        cx=x
+        for k in range(len(meta)):
+            if out and cx>x+w-1:break
+            top=y+max(0,(h-fh)//2) if full else y+pt+(ch-fh)//2
+            ctop=y+max(0,(h-cs)//2) if full else y+pt+(ch-cs)//2
+            it=place(k,cx,x+w-cx,y,h if full else rh,top,ctop,span=False)
+            out.append(it); cx=it['core'][2]+1+gap+((sep_w+gap) if sep_char else 0)
+        for a,b in zip(out,out[1:]):
+            seps.append(('v',a['core'][2]+1+(gap-1)//2) if not sep_char else ('char',a['core'][2]+1+gap))
+    else:
+        cy=y
+        for k in range(len(meta)):
+            if out and cy>y+h-1:break
+            it=place(k,x,w,cy,rh,cy+pt+(ch-fh)//2,cy+pt+(ch-cs)//2)
+            out.append(it); cy=it['core'][3]+1+gap
+        for a,b in zip(out,out[1:]):seps.append(('h',a['core'][3]+1+(gap-1)//2))
+    right=max([it['core'][2] for it in out] or [x-1]); bottom=max([it['core'][3] for it in out] or [y-1])
+    return out,seps,(max(1,right-x+1),max(1,bottom-y+1)),sep_char
 
 
 def list_box(c):
@@ -1282,25 +1402,32 @@ def list_box(c):
 
 
 def list_size(c):
-    """Hug size of a list: every item with its padding and affixes, gaps (and separators) between items,
-    plus the list's own inner frame and padding."""
-    _,_,(w,h),_=list_geometry(c,0,0,10000,10000,hug=True); k,(pt,pr,pb,pl)=list_box(c)
-    return max(1,w+pl+pr+2*k),max(1,h+pt+pb+2*k)
+    """Hug size of a list: every item with its padding, affixes and checkbox, gaps (and separators) between
+    items, plus the list's own inner frame and padding. A fixed width (Height: Hug content only) is used as
+    is, so a grid finds the same columns it will draw."""
+    hug=bool(c.get('hug') or c.get('hug_w')); k,(pt,pr,pb,pl)=list_box(c)
+    w=10000 if hug else max(0,c['width']-2*k-pl-pr)
+    _,_,(cw,ch),_=list_geometry(c,0,0,w,10000,hug=hug)
+    return max(1,cw+pl+pr+2*k),max(1,ch+pt+pb+2*k)
 
 
 def draw_list(img,c,ink):
-    """List: comma-separated items, one per row (or side by side); per-state background, stroke, text colour,
-    underline, prepend / append; the selected one may grow (highlight padding); separators between items."""
+    """List: comma-separated items, one per row, side by side or in a grid; per-state background, stroke, text
+    colour, underline, checkbox, prepend / append; the selected one may grow (highlight padding); separators."""
     ops=dict(black=1,white=0); X,Y,W,H=(c[k] for k in ('x','y','width','height'))
     if c.get('box_fill','none')!='none':draw_rect(img,X,Y,X+W-1,Y+H-1,ops[c['box_fill']])
     k,(pt,pr,pb,pl)=list_box(c); x,y=X+k+pl,Y+k+pt; w,h=max(0,W-2*k-pl-pr),max(0,H-2*k-pt-pb)
     clip=dict(x=x,y=y,width=w,height=h); cl=lambda b:(max(x,b[0]),max(y,b[1]),min(x+w-1,b[2]),min(y+h-1,b[3]))
-    items,seps,_,sep_char=list_geometry(c,x,y,w,h)
+    items,seps,size,sep_char=list_geometry(c,x,y,w,h); is_grid=c.get('orientation')=='grid'
+    check=c.get('check',False); shape=c.get('check_shape','square'); pad=c.get('check_padding',0); marks=c.get('marks','') if check else ''
     for it in items:
         st=it['style'];b=cl(it['box']);ok=b[0]<=b[2] and b[1]<=b[3]
         if ok and st['bg'] in ops:draw_rect(img,*b,ops[st['bg']])
         if ok and st['stroke']!='none':outline(img,*b,ops[st['stroke']],st['stroke_width'],st['stroke_style']=='dotted')
-        op=ops[st['color']]; tx=it['left']
+        op=ops[st['color']]; tx=it['left']+it['mw']
+        if check and it['cs']:
+            on=it['index']<len(marks) and marks[it['index']]=='1'
+            fill_cells(img,{(xx,yy) for xx,yy in check_cells(it['left'],it['check_top'],it['cs'],shape,pad,on) if x<=xx<x+w and y<=yy<y+h},op)
         for value,at in ((st['prepend'],tx),(st['append'],tx+it['pw']+it['tw']+(2 if it['tw'] else 0))):
             if not value:continue
             g=affix_glyph(value)
@@ -1316,15 +1443,17 @@ def draw_list(img,c,ink):
                 if y<=uy<y+h and ux0<=ux1:draw_rect(img,ux0,uy,ux1,uy,op)
         if ok and st['bg']=='invert':draw_rect(img,*b,2)
     sop=ops[c.get('sep_color',c.get('color','black'))]; inset=c.get('sep_inset',0); dotted=c.get('sep')=='dotted'
+    hx1=min(x+size[0]-1,x+w-1) if is_grid else x+w-1
+    vy1=min(y+size[1]-1,y+h-1) if is_grid else y+h-1
     for kind,pos in seps if c.get('sep','none')!='none' else []:
         if kind=='char':
             top=items[0]['top'];draw_text(img,pos,top,sep_char,x+w-pos,sop,font_key=c.get('font','default'),uppercase=False,clip=clip)
         elif kind=='h' and y<=pos<y+h:
-            a,b_=x+inset,x+w-1-inset
+            a,b_=x+inset,hx1-inset
             if dotted:fill_cells(img,{(xx,pos) for xx in range(a,b_+1) if (xx-a)%2==0},sop)
             elif a<=b_:draw_rect(img,a,pos,b_,pos,sop)
         elif kind=='v' and x<=pos<x+w:
-            a,b_=y+inset,y+h-1-inset
+            a,b_=y+inset,vy1-inset
             if dotted:fill_cells(img,{(pos,yy) for yy in range(a,b_+1) if (yy-a)%2==0},sop)
             elif a<=b_:draw_rect(img,pos,a,pos,b_,sop)
     if c.get('stroke','none')!='none':

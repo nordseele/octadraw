@@ -62,7 +62,7 @@ Every layer has `id` (unique on its screen), `type`, `style`, `x`, `y`, `width`,
 | `image` | `pixels`: `width × height` characters, `1` lit (black), `0` unlit (drawn only when `white` is `opaque`), `.` transparent; `invert`, `xor` |
 | `grid` | table: `grid_rows`, `grid_cols`, `header_rows`, `header_cols`, `header`, `header_text`, `side_text`, lines and fill |
 | `layout` | auto layout of its children: `layout_cols`, `layout_rows`, `layout_flow`, `gap_x`, `gap_y`, `cell_w` / `cell_h` (`hug` / `fill`) |
-| `list` | `items` (comma separated), `orientation`, `selected`, per-state styles `n_*` / `s_*`, separators |
+| `list` | `items` (comma separated), `orientation` (`vertical` / `horizontal` / `grid`), `selected`, per-state styles `n_*` / `s_*`, separators; checkbox: `check`, `check_size` (`auto` or 5..12), `check_shape` (`square` / `round`), `check_padding` (0..3), `check_gap` (0..8), `marks` (one `0` / `1` per item); grid: `list_cols` / `list_rows` (0 = automatic, 1..64), `list_flow` (`rows` / `columns`), `list_col_width` (`hug` = each column fits its content; `equal` = same width for every column, never below the widest item), `list_col_max` (0 = automatic, 1..128 px) |
 | `multislider` | `values` or a generated `source`, `range_min` / `range_max`, `ms_style`, `selected` |
 | `scrollbar` | `orientation`, `track`, `total`, `visible`, `position` |
 | `waveform` | test signal for previews: `signal`, `display`, `amplitude`, `cycles`, `seed`, `playhead`, trims, slices |

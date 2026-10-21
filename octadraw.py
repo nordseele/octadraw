@@ -56,7 +56,7 @@ def main():
             elif self.path == '/brand':
                 self.reply(brand.load())
             elif self.path == '/server-info':
-                self.reply({'stale': code_stamp() > STARTED})
+                self.reply({'stale': code_stamp() > STARTED, 'work': str(C.STORE)})
             elif self.path == '/fonts':
                 self.reply(fonts.catalog())
             elif self.path == '/references':

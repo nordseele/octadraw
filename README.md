@@ -37,12 +37,20 @@ Your work lives in the **work folder**: `./work/` by default, or the folder name
   scrollbars, waveforms, isometric solids, PNG images, and reserved zones (areas the host draws itself,
   such as an animation). Drag to move or resize. Arrow keys move by 1 px, Shift + arrows by 10 px.
   The `?` button in Properties shows the shortcuts.
+- **Lists**: comma-separated items, optionally with a checkbox on every row (height, square or round,
+  inner padding, gap after the checkbox, and a checked state per row). A list can stay a column, a row, or
+  reflow into a grid of columns and rows, fixed or automatic; columns hug their content or share the width
+  equally, with a maximum column width. A new list keeps its width and grows in height as you add items;
+  past 64 px it clips at the screen edge, so use the grid for long lists.
 - **Containers**: rectangles, groups, tables and auto layouts hold children. Children can dock to a side,
   or follow constraints when their parent is resized.
 - **Components**: mark a layer as a master and place instances of it. Edits to the master reach every
   instance, and a master can have named **states** (for example normal / selected).
 - **Visibility states**: named snapshots of which layers are shown on a screen.
 - **Editor-only**: untick "on device" to keep a layer or background out of the PNGs and the code.
+- **Reference image**: put 128 × 64 PNGs in `references/` in your work folder, reload the page, then pick
+  one as the screen background. It is a tracing guide behind your layers: the editor shows it, the exported
+  PNGs and the generated code never do.
 - **Preview**: LCD (lit pixel = dark) or OLED (lit pixel = bright). This changes the display only,
   never the project or the export.
 
@@ -119,6 +127,7 @@ preserves its registers and the stack.
 ## More
 
 - `AGENTS.md`: how a coding agent wires an export into a ColdFire module, and the rules for changing OctaDraw.
+- `CHANGELOG.md`: release notes.
 - `docs/FORMAT.md`: the project JSON.
 
 ## Licence
