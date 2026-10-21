@@ -19,17 +19,17 @@ assembly all come from the same draw commands.
 
 ## Future Development & Other Targets
 
-*If you're tempted to fork OctaDraw to make it work with another machine—please go ahead... However, from the creator's perspective, the most valuable approach would be to **help build a modular output architecture** instead.*
+*If you're tempted to fork OctaDraw to make it work with another machine, please go ahead. However, from the creator's perspective, the most valuable approach would be to **help build a modular output architecture** instead.*
 
-Today, OctaDraw does not currently use a modular output architecture: it specifically targets the *Elektron Octatrack* display and generates ColdFire assembly for it. 
+OctaDraw does not currently use a modular output architecture: it specifically targets the *Elektron Octatrack* display and generates ColdFire assembly for it.
 
-The primary vision for future development is the implementation of **pluggable output modules**—one per target platform. This would allow a single OctaDraw project to compile to the display format and code structure of other hardware devices (such as the Digitakt). Rather than creating fragmented forks for different machines, an output-module system will maintain a unified editor across multiple targets.
+The primary vision for future development is the implementation of **pluggable output modules** — one per target platform. This would allow a single OctaDraw project to compile to the display format and code structure of other hardware devices (such as the Digitakt). Rather than creating fragmented forks for different machines, an output-module system would maintain a unified editor across multiple targets.
 
 ### About Octalab
 **OctaDraw** is developed within **[Octalab](https://github.com/nordseele/octalab)**, an open-source research and experimentation lab for hardware modification (which also hosts projects like **[OType](https://github.com/nordseele/OType)**). It was initially built to power **OT1** (a custom personal firmware), but is shared here to assist anyone experimenting with custom firmware hacks and modifications.
 
 ### Contributions & Support
-Dedicated support is not provided, but pull requests and contributions are always welcome—especially towards multi-target support! If **OctaDraw** is useful to your experiments, *feel free to leave a small thank-you on [Ko-fi](https://ko-fi.com/bumathan) to support the work already done*.
+Dedicated support is not provided, but pull requests and contributions are always welcome — especially towards multi-target support! If **OctaDraw** is useful to your experiments, *feel free to leave a small thank-you on [Ko-fi](https://ko-fi.com/bumathan) for the work already done*.
 
 ----
 
@@ -166,5 +166,5 @@ preserves its registers and the stack.
 
 ----
 
-*Octatrack and Digitakt are trademarks of their respective owners. This project is not affiliated
-with them and ships no part of any firmware.*
+*Elektron, Octatrack and Digitakt are trademarks of Elektron. This project is not affiliated with
+Elektron and ships no part of any firmware.*
