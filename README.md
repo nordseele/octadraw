@@ -15,19 +15,23 @@ assembly all come from the same draw commands.
 ### Demo video
 [![Demo video](https://img.youtube.com/vi/yNRahR6SXeg/hqdefault.jpg)](https://www.youtube.com/watch?v=yNRahR6SXeg)
 
-## Other targets
+----
 
-OctaDraw does not have an output-module system yet: today it targets the Octatrack's screen and
-generates ColdFire code for it. From the creator's perspective, the most interesting development
-that could happen next is a set of **output modules** — one per target — turning the same project
-into another machine's screen format and code (Digitakt and others). Rather than forking OctaDraw
-for each machine, output modules would keep one editor for several targets.
+## Future Development & Other Targets
 
-OctaDraw is used to develop **OT1** and was built within **Octalab**.
+*If you're tempted to fork OctaDraw to make it work with another machine—please go ahead... However, from the creator's perspective, the most valuable approach would be to **help build a modular output architecture** instead.*
 
-We do not provide dedicated support, but pull requests are welcome. If OctaDraw is useful to you
-as it is, you can leave a small thank-you on [Ko-fi](https://ko-fi.com/bumathan) for the work
-already done.
+Today, OctaDraw does not currently use a modular output architecture: it specifically targets the *Elektron Octatrack* display and generates ColdFire assembly for it. 
+
+The primary vision for future development is the implementation of **pluggable output modules**—one per target platform. This would allow a single OctaDraw project to compile to the display format and code structure of other hardware devices (such as the Digitakt). Rather than creating fragmented forks for different machines, an output-module system will maintain a unified editor across multiple targets.
+
+### About Octalab
+**OctaDraw** is developed within **[Octalab](https://github.com/nordseele/octalab)**, an open-source research and experimentation lab for hardware modification (which also hosts projects like **[OType](https://github.com/nordseele/OType)**). It was initially built to power **OT1** (a custom personal firmware), but is shared here to assist anyone experimenting with custom firmware hacks and modifications.
+
+### Contributions & Support
+Dedicated support is not provided, but pull requests and contributions are always welcome—especially towards multi-target support! If **OctaDraw** is useful to your experiments, *feel free to leave a small thank-you on [Ko-fi](https://ko-fi.com/bumathan) to support the work already done*.
+
+----
 
 ## Run it
 
@@ -35,7 +39,7 @@ You need Python 3.9 or later and Pillow.
 
 ```sh
 python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
-.venv/bin/python octadraw.py            # then open http://127.0.0.1:8077/
+.venv/bin/python octadraw.py          # then open http://127.0.0.1:8077/
 ```
 
 On macOS you can double-click `OctaDraw.command` instead. Use `--port` (or `PORT=…` for the
@@ -87,7 +91,7 @@ To draw with the Octatrack's own eight fonts, extract them from **your own copy*
 (the `.syx` from the official download, or an OS image you unpacked from it):
 
 ```sh
-python3 tools/extract_fonts.py OCTATRACK_OS1.40C.syx      # writes os-font-1.bdf … os-font-8.bdf
+python3 tools/extract_fonts.py OCTATRACK_OS1.40C.syx       # writes os-font-1.bdf … os-font-8.bdf
 ```
 
 They go to your font folder (or the folder given as a second argument). The script holds no firmware data
@@ -160,5 +164,7 @@ preserves its registers and the stack.
   screens in any firmware module without the GPL applying to it.
 - The bundled fonts keep their own licences (`fonts/README.md`).
 
-Octatrack and Digitakt are trademarks of their respective owners. This project is not affiliated
-with them and ships no part of any firmware.
+----
+
+*Octatrack and Digitakt are trademarks of their respective owners. This project is not affiliated
+with them and ships no part of any firmware.*
