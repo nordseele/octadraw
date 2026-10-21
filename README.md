@@ -7,6 +7,11 @@ and a JSON description that you (or a coding agent) wire into your own firmware 
 What you see in the editor is exactly what the generated code draws: the preview, the PNGs and the
 assembly all come from the same draw commands.
 
+<img width="1382" height="748" alt="otdraw" src="https://github.com/user-attachments/assets/e0900278-3ce1-4ef0-a231-e287a7ee7908" />
+
+[![Démo video](https://img.youtube.com/vi/yNRahR6SXeg/maxresdefault.jpg)](https://www.youtube.com/watch?v=yNRahR6SXeg)
+
+
 ## Run it
 
 You need Python 3.9 or later and Pillow.
