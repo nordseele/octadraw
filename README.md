@@ -8,12 +8,26 @@ What you see in the editor is exactly what the generated code draws: the preview
 assembly all come from the same draw commands.
 
 ----
-<img width="1382" height="748" alt="otdraw" src="https://github.com/user-attachments/assets/e0900278-3ce1-4ef0-a231-e287a7ee7908" />
+<img width="1382" height="748" alt="OctaDraw editor" src="https://github.com/user-attachments/assets/e0900278-3ce1-4ef0-a231-e287a7ee7908" />
 
 ----
 
 ### Demo video
 [![Demo video](https://img.youtube.com/vi/yNRahR6SXeg/hqdefault.jpg)](https://www.youtube.com/watch?v=yNRahR6SXeg)
+
+## Other targets
+
+OctaDraw does not have an output-module system yet: today it targets the Octatrack's screen and
+generates ColdFire code for it. From the creator's perspective, the most interesting development
+that could happen next is a set of **output modules** — one per target — turning the same project
+into another machine's screen format and code (Digitakt and others). Rather than forking OctaDraw
+for each machine, output modules would keep one editor for several targets.
+
+OctaDraw is used to develop **OT1** and was built within **Octalab**.
+
+We do not provide dedicated support, but pull requests are welcome. If OctaDraw is useful to you
+as it is, you can leave a small thank-you on [Ko-fi](https://ko-fi.com/bumathan) for the work
+already done.
 
 ## Run it
 
@@ -146,5 +160,5 @@ preserves its registers and the stack.
   screens in any firmware module without the GPL applying to it.
 - The bundled fonts keep their own licences (`fonts/README.md`).
 
-Octatrack is a trademark of its owner. This project is not affiliated with it and ships no part of any
-firmware.
+Octatrack and Digitakt are trademarks of their respective owners. This project is not affiliated
+with them and ships no part of any firmware.
